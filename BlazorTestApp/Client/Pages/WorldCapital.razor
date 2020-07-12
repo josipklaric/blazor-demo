@@ -1,0 +1,62 @@
+﻿@page "/capitals"
+@using BlazorTestApp.Shared
+@inject HttpClient http
+
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="display-4">World capitals</h1>
+        <p class="lead">Here you can find the name for the capital city of each country</p>
+    </div>
+</div>
+
+@if (this.countries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="card w-75">
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <select class="form-control" @bind="@selectedCountry">
+                    <option>Please select country</option>
+                    @foreach (var country in this.countries)
+                    {
+                        <option value="@country">@country</option>
+                    }
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" @onclick="GetCapitalCity">Get capital</button>
+                </div>
+            </div>
+            <h3 class="card-title">@capital?.CapitalName</h3>
+            <p class="card-text">@capital?.ContinentName</p>
+        </div>
+    </div>
+}
+
+@code {
+
+    private List<string> countries;
+    private Capital capital;
+    private string selectedCountry = "Please select country";
+    protected bool isReady { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.countries = await http.GetFromJsonAsync<List<string>>("Capitals/GetCountries");
+    }
+
+    private async void GetCapitalCity()
+    {
+        if (selectedCountry == "Please select country")
+        {
+            this.capital = null;
+            return;
+        }
+
+        this.capital = await http.GetFromJsonAsync<Capital>($"Capitals/GetCapital?country={this.selectedCountry}");
+        StateHasChanged();
+    }
+
+}
