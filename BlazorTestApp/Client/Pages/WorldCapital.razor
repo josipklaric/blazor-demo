@@ -47,7 +47,7 @@ else
         this.countries = await http.GetFromJsonAsync<List<string>>("Capitals/GetCountries");
     }
 
-    private async void GetCapitalCity()
+    private async Task GetCapitalCity()
     {
         if (selectedCountry == "Please select country")
         {
@@ -56,7 +56,6 @@ else
         }
 
         this.capital = await http.GetFromJsonAsync<Capital>($"Capitals/GetCapital?country={this.selectedCountry}");
-        StateHasChanged();
     }
 
 }
